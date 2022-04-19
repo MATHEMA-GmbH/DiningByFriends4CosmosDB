@@ -8,7 +8,7 @@ Before you can run the App you have to create a Graph DB in Cosmos DB and modify
 ```C#
         string cosmosHostname = "Your URL";                               // Enter your Graph DB URL
         int cosmosPort = 443;
-        string cosmosAuthKey = "Your auth key;                             // Enter your Authkey here
+        string cosmosAuthKey = "Your auth key";                           // Enter your Authkey here
         string cosmosDatabase = "your database";                          // Enter your Database
         string cosmosCollection = "your colletion";                       // Enter your Colletion  
 ```
