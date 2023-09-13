@@ -10,12 +10,15 @@ namespace _01_DiningByFriends
 {
     public class Program
     {
+        private const string partitionKey = "TODO"; //must be the same as in the CosmosDB collection without the leading "/"
+
         private const string PERSON = "person";
         private const string FIRST_NAME = "first_name";
         private const string HOBBY = "Hobby";
 
         static void Main(string[] args)
         {
+
             string cosmosHostname = "YOUR URL";
             int cosmosPort = 443;
             string cosmosAuthKey = "YOUR AUTH KEY";
@@ -80,7 +83,7 @@ namespace _01_DiningByFriends
         public static void RunApplication(IGremlinClient gremlinClient)
         {
             var g = GetTraversal(gremlinClient);
-            
+           
             int option = -1;
             while (option != 0)
             {
@@ -139,7 +142,7 @@ namespace _01_DiningByFriends
             string name = GetInput("First name of new person: ");
             string hobby = GetInput("Hobby of new person: ");
 
-            var newVertex = g.AddV(PERSON).Property(FIRST_NAME, name).Property(HOBBY, hobby).Next();
+            var newVertex = g.AddV(PERSON).Property(partitionKey, partitionKey).Property(FIRST_NAME, name).Property(HOBBY, hobby).Next();
 
             return newVertex.ToString();
         }
