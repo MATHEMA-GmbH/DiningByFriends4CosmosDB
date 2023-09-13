@@ -6,14 +6,18 @@ This application is using the Mathema.Bytecode4CosmosDB nuget package (prereleas
 
 Before you can run the App you have to create a Graph DB in Cosmos DB and modify the following properties accordingly:
 ```C#
+        private const string partitionKey = "TODO"; //must be the same as in the CosmosDB collection without the leading "/"
+
+        //... in the main method:
+
         string cosmosHostname = "Your URL";                               // Enter your Graph DB URL
         int cosmosPort = 443;
         string cosmosAuthKey = "Your auth key";                           // Enter your Authkey here
         string cosmosDatabase = "your database";                          // Enter your Database
-        string cosmosCollection = "your colletion";                       // Enter your Colletion  
+        string cosmosCollection = "your collection";                       // Enter your Collection  
 ```
 
-Example 
+Example
 ```C#
         string cosmosHostname = "ddcgremlin.gremlin.cosmosdb.azure.com";
         int cosmosPort = 443;
