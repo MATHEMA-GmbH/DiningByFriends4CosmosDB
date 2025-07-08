@@ -1,29 +1,29 @@
-﻿
-using Gremlin.Net.Driver;
+﻿using Gremlin.Net.Driver;
 using Gremlin.Net.Process.Traversal;
 using Gremlin.Net.Structure;
-using Newtonsoft.Json;
 using static Gremlin.Net.Process.Traversal.AnonymousTraversalSource;
 using Mathema.Bytecode4CosmosDB;
 
-namespace _01_DiningByFriends
+namespace Mathema.DiningByFriendsCosmosDB
 {
     public class Program
     {
-        private const string partitionKey = "TODO"; //must be the same as in the CosmosDB collection without the leading "/"
+        private const string partitionKey = "partitionKey";
 
         private const string PERSON = "person";
         private const string FIRST_NAME = "first_name";
-        private const string HOBBY = "Hobby";
+        private const string HOBBY = "hobby";
+        private const string FRIENDS = "friends";
 
         static void Main(string[] args)
         {
-
-            string cosmosHostname = "YOUR URL";
+            /*to be changed to your CosmosDB Gremlin endpoint and auth key*/
+             string cosmosHostname = "YOUR HOST NAME";
             int cosmosPort = 443;
             string cosmosAuthKey = "YOUR AUTH KEY";
             string cosmosDatabase = "YOUR DATABASE";
             string cosmosCollection = "YOUR COLLECTION";
+
 
             try
             {
@@ -142,7 +142,7 @@ namespace _01_DiningByFriends
             string name = GetInput("First name of new person: ");
             string hobby = GetInput("Hobby of new person: ");
 
-            var newVertex = g.AddV(PERSON).Property(partitionKey, partitionKey).Property(FIRST_NAME, name).Property(HOBBY, hobby).Next();
+            var newVertex = g.AddV(PERSON).Property(partitionKey, "").Property(FIRST_NAME, name).Property(HOBBY, hobby).Next();
 
             return newVertex.ToString();
         }
@@ -161,7 +161,7 @@ namespace _01_DiningByFriends
             string name = GetInput("First name of person: ");
 
             var traverser = g.V().
-                    Has(PERSON, "first_name", name).ValueMap<string, object>();
+                    Has(PERSON, FIRST_NAME, name).ValueMap<string, object>();
             
 
             IList<IDictionary<string, object>> properties = traverser.ToList();
@@ -172,7 +172,6 @@ namespace _01_DiningByFriends
                 foreach (var item in p)
                 {
                     result = result + item.Key + " = "+ string.Join(",", item.Value as IEnumerable<object>) + "\n";
-                    //result = result + "\n";
                 }
             }
             
@@ -201,9 +200,9 @@ namespace _01_DiningByFriends
 
             string name = GetInput("First name of person: ");
 
-            long vertexCount = g.V().Has("person", "first_name", name).
-                    SideEffect(__.Drop()).
-                    Count().Next();
+            long vertexCount = g.V().Has(PERSON, FIRST_NAME, name)
+                                    .SideEffect(__.Drop())
+                                    .Count().Next();
 
             return vertexCount;
         }
@@ -217,8 +216,8 @@ namespace _01_DiningByFriends
 
 
             Edge newEdge = 
-            g.V().Has("person", "first_name", fromName)
-                    .AddE("friends").To(__.V().Has("person", "first_name", toName))
+            g.V().Has(PERSON, FIRST_NAME, fromName)
+                    .AddE(FRIENDS).To(__.V().Has(PERSON, FIRST_NAME, toName))
                     .Next();
 
             return newEdge.ToString();
@@ -229,10 +228,10 @@ namespace _01_DiningByFriends
             string name = GetInput("First name of person: ");
 
 
-            IList<object> friends = g.V().Has("person", "first_name", name).
-                    Both("friends").Dedup().
-                    Values<object>("first_name").
-                    ToList();
+            IList<object> friends = g.V().Has(PERSON, FIRST_NAME, name)
+                                     .Both(FRIENDS).Dedup()
+                                     .Values<object>(FIRST_NAME)
+                                     .ToList();
 
             return String.Join(", \n", friends);
         }
@@ -243,10 +242,9 @@ namespace _01_DiningByFriends
             string name = GetInput("First name of person: ");
 
 
-            IList<string> foff = g.V().Has("person", "first_name", name).
-                    Repeat(__.Out("friends")
-                    ).Times(2).Dedup().
-                    Values<string>("first_name").ToList();
+            IList<string> foff = g.V().Has(PERSON, FIRST_NAME, name)
+                                  .Repeat(__.Out(FRIENDS)).Times(2).Dedup()
+                                  .Values<string>(FIRST_NAME).ToList();
 
             return String.Join(", \n", foff);
         }
@@ -256,12 +254,12 @@ namespace _01_DiningByFriends
             string fromName = GetInput("First name of person (first person): ");
             string toName = GetInput("First name of person: (second person)");
 
-            IList<Gremlin.Net.Structure.Path> friends = g.V().Has("person", "first_name", fromName).
-                    Until(__.Has("person", "first_name", toName)).
-                    Repeat(
-                        __.Both("friends").SimplePath()
-                    ).Path()
-                    .ToList();
+            IList<Gremlin.Net.Structure.Path> friends = g.V().Has(PERSON, FIRST_NAME, fromName)
+                                                         .Until(__.Has(PERSON, FIRST_NAME, toName))
+                                                         .Repeat(
+                                                                 __.Both(FRIENDS).SimplePath()
+                                                          ).Path()
+                                                         .ToList();
 
             return String.Join(", \n", friends);
         }
